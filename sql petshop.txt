@@ -1,0 +1,186 @@
+/*
+Codigo SQL do BDPetShopIFSP
+Data: 05/10/2022
+Sara Alice
+*/
+--------------------------------------------
+--Criar Tabela TBEstado
+CREATE TABLE TBEstado (
+	IDUF	        varchar(2) NOT NULL,
+	NomeEstado	varchar(50) NOT NULL,
+	PRIMARY KEY(IDUF)
+);
+---------------------------------------------
+--Cadastrar dados em TBEstado
+INSERT INTO TBEstado VALUES
+('SP','SÃO PAULO'),
+('RJ','RIO DE JANEIRO'),
+('PR','PARANA');
+---------------------------------------------
+--Criar Tabela TBCidade
+CREATE TABLE TBCidade (
+	IDCidade	    INT         NOT NULL,
+	NomeCidade	varchar(50) NOT NULL,
+	CodUF	        varchar(2)  NOT NULL,
+	PRIMARY KEY(IDCidade)
+);
+----------------------------------------------
+--Cadastrar dados em TBCidade
+INSERT INTO TBCidade VALUES
+(01,'SANTOS','SP'),
+(02,'BUZIOS','RJ'),
+(03,'CURITIBA','PR');
+-----------------------------------------------
+--Criar Tabela TBProduto
+CREATE TABLE TBProduto (
+	IDProduto	         INT            NOT NULL,
+	CodigoBarras	     INT            NOT NULL,
+	NomeProduto	     varchar(50)    NOT NULL,
+	MarcarProduto	     varchar(50)    NOT NULL,
+	CodTipo	         INT            NOT NULL,
+	ValorCompra	     decimal(10, 2) NOT NULL,
+	ValorVenda	     decimal(10, 2) NOT NULL,
+	QuantidadeCompra	 INT            NOT NULL,
+	QuantidadeEstoque  INT            NOT NULL,
+	CodFornecedor	     INT            NOT NULL,
+	CodFuncao	         INT            NOT NULL,
+	PRIMARY KEY(IDProduto),
+	FOREIGN KEY(CodTipo) REFERENCES TBTipo(IDTipo),
+	FOREIGN KEY(CodFornecedor) REFERENCES TBFornecedor(IDFornecedor),
+	FOREIGN KEY(CodFuncao) REFERENCES TBFuncao(IDFuncao)
+);
+------------------------------------------------
+--Criar Tabela TBProdutosCompra
+CREATE TABLE TBProdutosCompra (
+	CodCompra	    INT            NOT NULL,
+	CodProduto	INT            NOT NULL,
+	Quantidade	INT            NOT NULL,
+	ValorCompra	decimal(10, 2) NOT NULL,
+	PRIMARY KEY(CodCompra),
+	FOREIGN KEY(CodProduto) REFERENCES TBProduto(IDProduto),
+	FOREIGN KEY(CodCompra) REFERENCES TBCompra(IDCompra)
+);
+-------------------------------------------------
+--Criar Tabela TBTipo
+CREATE TABLE TBTipo (
+	IDTipo	INT         NOT NULL,
+	NomeTipo	varchar(50) NOT NULL,
+	PRIMARY KEY(IDTipo)
+);
+-------------------------------------------------
+--Criar Tabela TBFornecedor
+CREATE TABLE TBFornecedor (
+	IDFornecedor	INT         NOT NULL,
+	RazaoSocial	varchar(50) NOT NULL,
+	NomePetShop	varchar(50) NOT NULL,
+	CNPJ	        varchar(18) NOT NULL,
+	Endereco	    varchar(50) NOT NULL,
+	CEP	        INT         NOT NULL,
+	Telefone	    BigINT      NOT NULL,
+	CodCidade	    INT         NOT NULL,
+	PRIMARY KEY(IDFornecedor),
+	FOREIGN KEY(CodCidade) REFERENCES TBCidade(IDCidade)
+);
+-------------------------------------------------
+--Crair Tabela TBCliente
+CREATE TABLE TBCliente 
+(
+	IDCliente	    INT         NOT NULL,
+	NomeCliente	varchar(50) NOT NULL,
+	CPF	        varchar(18) NOT NULL,
+	Endereco	    varchar(50) NOT NULL,
+	CEP	        INT         NOT NULL,
+	Telefone	    BigINT      NOT NULL,
+	CodCidade	    INT         NOT NULL,
+	Email	        varchar(50) NOT NULL,
+	PRIMARY KEY(IDCliente),
+	FOREIGN KEY(CodCidade) REFERENCES TBCidade(IDCidade)
+);
+-------------------------------------------------
+--Criar Tabela TBCompra
+CREATE TABLE TBCompra 
+(
+	IDCompra	INT NOT NULL,
+	DataCompra	Data NOT NULL,
+	CodCliente	INT NOT NULL,
+	CodFuncionario	INT NOT NULL,
+	ValorCompra	decimal(10, 2) NOT NULL,
+	PRIMARY KEY(IDCompra),
+	FOREIGN KEY(CodCliente) REFERENCES TBCliente(IDCliente),
+	FOREIGN KEY(CodFuncionario) REFERENCES TBFuncionario(IDFuncionario)
+);
+-------------------------------------------------
+--Criar Tabela TBClienteServico
+CREATE TABLE TBClienteServico (
+	CodCliente	INT NOT NULL,
+	CodServico	INT NOT NULL,
+	Data	DataTime NOT NULL,
+	PRIMARY KEY(CodCliente),
+	FOREIGN KEY(CodCliente) REFERENCES TBCliente(IDCliente),
+	FOREIGN KEY(CodServico) REFERENCES TBServico(IDServico)
+);
+-------------------------------------------------
+--Criar Tabela TBAnimal
+CREATE TABLE TBAnimal (
+	IDAnimal	INT NOT NULL,
+	NomeAnimal	varchar(50) NOT NULL,
+	Especie	varchar(50) NOT NULL,
+	Raca	varchar(50) NOT NULL,
+	Sexo	varchar(1) NOT NULL,
+	CodCliente	INT NOT NULL,
+	PRIMARY KEY(IDAnimal),
+	FOREIGN KEY(CodCliente) REFERENCES TBCliente(IDCliente)
+);
+-------------------------------------------------
+--Criar Tabela TBAnimalServico
+CREATE TABLE TBAnimalServico (
+	CodAnimal	INT NOT NULL,
+	CodServico	INT NOT NULL,
+	Data	DataTime NOT NULL,
+	Observacao	varchar(100) NOT NULL,
+	PRIMARY KEY(CodAnimal),
+	FOREIGN KEY(CodServico) REFERENCES TBServico(IDServico),
+	FOREIGN KEY(CodAnimal) REFERENCES TBAnimal(IDAnimal)
+);
+-------------------------------------------------
+--Criar Tabela TBServico
+CREATE TABLE TBServico (
+	IDServico	INT NOT NULL,
+	Descricao	varchar(100) NOT NULL,
+	ValorServico	decimal(10, 2) NOT NULL,
+	TempoGasto	Time NOT NULL,
+	Observacao	varchar(100) NOT NULL,
+	PRIMARY KEY(IDServico)
+);
+-------------------------------------------------
+--Criar Tabela TBFuncionario
+CREATE TABLE TBFuncionario (
+	IDFuncionario	INT NOT NULL,
+	NomeFuncionario	varchar(50) NOT NULL,
+	CPF	varchar(18) NOT NULL,
+	CEP	INT NOT NULL,
+	Telefone	BigINT NOT NULL,
+	CodCidade	INT NOT NULL,
+	Email	varchar(50) NOT NULL,
+	PRIMARY KEY(IDFuncionario),
+	FOREIGN KEY(CodCidade) REFERENCES TBCidade(IDCidade)
+);
+-------------------------------------------------
+--Criar Tabela TBFuncionarioServico
+CREATE TABLE TBFuncionarioServico (
+	CodFuncionario	INT NOT NULL,
+	CodServico	INT NOT NULL,
+	Data	DataTime NOT NULL,
+	TempoGasto	Time NOT NULL,
+	FOREIGN KEY(CodFuncionario) REFERENCES TBFuncionario(IDFuncionario),
+	PRIMARY KEY(CodFuncionario),
+	FOREIGN KEY(CodServico) REFERENCES TBServico(IDServico)
+);
+-------------------------------------------------
+--Criar Tabela TBFuncao
+CREATE TABLE TBFuncao (
+	IDFuncao	INT NOT NULL,
+	DescricaoFuncao	varchar(50) NOT NULL,
+	PRIMARY KEY(IDFuncao)
+);
+-------------------------------------------------
